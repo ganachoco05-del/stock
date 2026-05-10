@@ -7,10 +7,14 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import {
-  readFavoriteStocks,
+  getFavoriteStocksServerSnapshot,
+  getFavoriteStocksSnapshot,
+  parseFavoriteStocksSnapshot,
   saveFavoriteStocks,
+  subscribeFavoriteStocks,
 } from "@/lib/favorites";
 import { defaultFavoriteStocks, stockList } from "@/lib/stocks";
 import type { FavoriteStock, StockQuote, StockSummary } from "@/types/stock";
@@ -26,6 +30,12 @@ type QuoteMetricProps = {
   tone?: "default" | "up" | "down";
   loading: boolean;
 };
+
+const subscribeHydrationState = () => () => {};
+
+const getClientHydrationState = () => true;
+
+const getServerHydrationState = () => false;
 
 const formatCurrency = (value?: string) => {
   if (!value) {
@@ -105,8 +115,22 @@ export default function Home() {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState("");
   const [symbolError, setSymbolError] = useState("");
-  const [favorites, setFavorites] = useState<FavoriteStock[]>(() =>
-    readFavoriteStocks(defaultFavoriteStocks),
+  const isHydrated = useSyncExternalStore(
+    subscribeHydrationState,
+    getClientHydrationState,
+    getServerHydrationState,
+  );
+  const favoriteSnapshot = useSyncExternalStore(
+    subscribeFavoriteStocks,
+    () => getFavoriteStocksSnapshot(defaultFavoriteStocks),
+    () => getFavoriteStocksServerSnapshot(defaultFavoriteStocks),
+  );
+  const favorites = useMemo(
+    () =>
+      isHydrated
+        ? parseFavoriteStocksSnapshot(favoriteSnapshot, defaultFavoriteStocks)
+        : defaultFavoriteStocks,
+    [favoriteSnapshot, isHydrated],
   );
 
   const filteredStocks = useMemo(() => {
@@ -215,7 +239,6 @@ export default function Home() {
   };
 
   const updateFavorites = (nextFavorites: FavoriteStock[]) => {
-    setFavorites(nextFavorites);
     saveFavoriteStocks(nextFavorites);
   };
 
