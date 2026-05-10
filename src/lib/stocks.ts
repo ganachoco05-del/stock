@@ -18,6 +18,7 @@ const createKrStock = (
   displaySymbol: string,
   koreanName: string,
   name: string,
+  searchAliases: string[] = [],
 ): StockSummary => ({
   symbol: `${displaySymbol}.KS`,
   name,
@@ -27,6 +28,7 @@ const createKrStock = (
   market: "KR",
   currency: "KRW",
   displaySymbol,
+  searchAliases,
 });
 
 export const stockList: StockSummary[] = [
@@ -60,21 +62,79 @@ export const stockList: StockSummary[] = [
   createUsStock("XOM", "Exxon Mobil Corporation", "NYSE"),
   createUsStock("CVX", "Chevron Corporation", "NYSE"),
   createUsStock("BA", "The Boeing Company", "NYSE"),
-  createKrStock("005930", "삼성전자", "Samsung Electronics Co., Ltd."),
-  createKrStock("000660", "SK하이닉스", "SK hynix Inc."),
-  createKrStock("035420", "NAVER", "NAVER Corporation"),
-  createKrStock("035720", "카카오", "Kakao Corp."),
-  createKrStock("005380", "현대차", "Hyundai Motor Company"),
-  createKrStock("000270", "기아", "Kia Corporation"),
-  createKrStock("051910", "LG화학", "LG Chem, Ltd."),
-  createKrStock("006400", "삼성SDI", "Samsung SDI Co., Ltd."),
-  createKrStock("068270", "셀트리온", "Celltrion, Inc."),
-  createKrStock("105560", "KB금융", "KB Financial Group Inc."),
-  createKrStock("055550", "신한지주", "Shinhan Financial Group Co., Ltd."),
-  createKrStock("012330", "현대모비스", "Hyundai Mobis Co., Ltd."),
-  createKrStock("028260", "삼성물산", "Samsung C&T Corporation"),
-  createKrStock("086790", "하나금융지주", "Hana Financial Group Inc."),
-  createKrStock("096770", "SK이노베이션", "SK Innovation Co., Ltd."),
+  createKrStock("005930", "삼성전자", "Samsung Electronics Co., Ltd.", [
+    "삼전",
+    "samsung",
+    "samsung electronics",
+    "005930.ks",
+  ]),
+  createKrStock("000660", "SK하이닉스", "SK hynix Inc.", [
+    "하이닉스",
+    "hynix",
+    "sk hynix",
+    "000660.ks",
+  ]),
+  createKrStock("035420", "NAVER", "NAVER Corporation", [
+    "네이버",
+    "naver",
+    "035420.ks",
+  ]),
+  createKrStock("035720", "카카오", "Kakao Corp.", [
+    "kakao",
+    "035720.ks",
+  ]),
+  createKrStock("005380", "현대차", "Hyundai Motor Company", [
+    "현대자동차",
+    "hyundai",
+    "hyundai motor",
+    "005380.ks",
+  ]),
+  createKrStock("000270", "기아", "Kia Corporation", [
+    "kia",
+    "000270.ks",
+  ]),
+  createKrStock("051910", "LG화학", "LG Chem, Ltd.", [
+    "lg chem",
+    "051910.ks",
+  ]),
+  createKrStock("006400", "삼성SDI", "Samsung SDI Co., Ltd.", [
+    "samsung sdi",
+    "006400.ks",
+  ]),
+  createKrStock("068270", "셀트리온", "Celltrion, Inc.", [
+    "celltrion",
+    "068270.ks",
+  ]),
+  createKrStock("105560", "KB금융", "KB Financial Group Inc.", [
+    "kb",
+    "kb금융지주",
+    "kb financial",
+    "105560.ks",
+  ]),
+  createKrStock("055550", "신한지주", "Shinhan Financial Group Co., Ltd.", [
+    "신한",
+    "shinhan",
+    "055550.ks",
+  ]),
+  createKrStock("012330", "현대모비스", "Hyundai Mobis Co., Ltd.", [
+    "모비스",
+    "hyundai mobis",
+    "012330.ks",
+  ]),
+  createKrStock("028260", "삼성물산", "Samsung C&T Corporation", [
+    "samsung c&t",
+    "028260.ks",
+  ]),
+  createKrStock("086790", "하나금융지주", "Hana Financial Group Inc.", [
+    "하나금융",
+    "hana",
+    "hana financial",
+    "086790.ks",
+  ]),
+  createKrStock("096770", "SK이노베이션", "SK Innovation Co., Ltd.", [
+    "sk innovation",
+    "096770.ks",
+  ]),
 ];
 
 export const defaultFavoriteStocks: FavoriteStock[] = stockList

@@ -11,6 +11,7 @@ export type StockSummary = {
   market: StockMarket;
   currency: StockCurrency;
   displaySymbol: string;
+  searchAliases?: string[];
 };
 
 export type FavoriteStock = Pick<StockSummary, "symbol" | "name">;

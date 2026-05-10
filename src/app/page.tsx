@@ -166,12 +166,16 @@ export default function Home() {
         const symbol = stock.symbol.toLowerCase();
         const name = stock.name.toLowerCase();
         const koreanName = stock.koreanName?.toLowerCase() ?? "";
+        const aliases = stock.searchAliases?.map((alias) =>
+          alias.toLowerCase(),
+        ) ?? [];
 
         return (
           displaySymbol.includes(keyword) ||
           symbol.includes(keyword) ||
           name.includes(keyword) ||
-          koreanName.includes(keyword)
+          koreanName.includes(keyword) ||
+          aliases.some((alias) => alias.includes(keyword))
         );
       })
       .slice(0, 8);
