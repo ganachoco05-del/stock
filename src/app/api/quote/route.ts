@@ -3,12 +3,24 @@ import {
   AlphaVantageError,
   parseAlphaVantageQuote,
 } from "@/lib/alphaVantage";
+import type { StockMarket } from "@/types/stock";
 
 const ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query";
+
+function parseMarket(value: string | null): StockMarket {
+  const normalizedValue = value?.trim().toUpperCase();
+
+  if (normalizedValue === "KR") {
+    return "KR";
+  }
+
+  return "US";
+}
 
 export async function GET(request: NextRequest) {
   const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
   const symbol = request.nextUrl.searchParams.get("symbol")?.trim().toUpperCase();
+  const market = parseMarket(request.nextUrl.searchParams.get("market"));
 
   if (!symbol) {
     return NextResponse.json(
@@ -45,7 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    const quote = parseAlphaVantageQuote(data);
+    const quote = parseAlphaVantageQuote(data, { market });
 
     return NextResponse.json({ quote });
   } catch (error) {

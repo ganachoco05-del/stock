@@ -185,7 +185,7 @@ export default function Home() {
     (favorite) => favorite.symbol === selectedStock.symbol,
   );
 
-  const loadQuote = useCallback(async (symbol: string) => {
+  const loadQuote = useCallback(async (symbol: string, market: StockMarket) => {
     quoteAbortController.current?.abort();
 
     const controller = new AbortController();
@@ -195,7 +195,8 @@ export default function Home() {
     setQuoteError("");
 
     try {
-      const response = await fetch(`/api/quote?symbol=${symbol}`, {
+      const searchParams = new URLSearchParams({ symbol, market });
+      const response = await fetch(`/api/quote?${searchParams.toString()}`, {
         signal: controller.signal,
       });
       const data = (await response.json()) as QuoteApiResponse;
@@ -230,7 +231,7 @@ export default function Home() {
     }
 
     didLoadInitialQuote.current = true;
-    void loadQuote(stockList[0].symbol);
+    void loadQuote(stockList[0].symbol, stockList[0].market);
   }, [loadQuote]);
 
   useEffect(() => {
@@ -243,7 +244,7 @@ export default function Home() {
     setSymbolInput(stock.displaySymbol);
     setNameInput(getStockDisplayName(stock));
     setSymbolError("");
-    void loadQuote(stock.symbol);
+    void loadQuote(stock.symbol, stock.market);
   };
 
   const handleMarketChange = (market: StockMarket) => {
@@ -262,7 +263,7 @@ export default function Home() {
     setNameInput("");
     setSymbolError("");
     setSelectedStock(nextStock);
-    void loadQuote(nextStock.symbol);
+    void loadQuote(nextStock.symbol, nextStock.market);
   };
 
   const handleSymbolSearch = (event: FormEvent<HTMLFormElement>) => {

@@ -1,4 +1,4 @@
-import type { StockQuote } from "@/types/stock";
+import type { StockMarket, StockQuote } from "@/types/stock";
 
 type AlphaVantageGlobalQuote = {
   "01. symbol"?: string;
@@ -18,6 +18,10 @@ type AlphaVantageQuoteResponse = {
   "Error Message"?: string;
 };
 
+type ParseAlphaVantageQuoteOptions = {
+  market: StockMarket;
+};
+
 export class AlphaVantageError extends Error {
   constructor(
     message: string,
@@ -30,6 +34,7 @@ export class AlphaVantageError extends Error {
 
 export function parseAlphaVantageQuote(
   data: AlphaVantageQuoteResponse,
+  options: ParseAlphaVantageQuoteOptions,
 ): StockQuote {
   if (data.Note || data.Information) {
     throw new AlphaVantageError(
@@ -45,10 +50,12 @@ export function parseAlphaVantageQuote(
   const quote = data["Global Quote"];
 
   if (!quote || Object.keys(quote).length === 0) {
-    throw new AlphaVantageError(
-      "조회 결과가 없습니다. 종목 코드를 다시 확인해주세요.",
-      404,
-    );
+    const message =
+      options.market === "KR"
+        ? "Alpha Vantage에서 해당 한국 종목 가격을 찾지 못했습니다. 한국 주식용 데이터 소스를 별도로 연결해야 할 수 있습니다."
+        : "조회 결과가 없습니다. 종목 코드를 다시 확인해주세요.";
+
+    throw new AlphaVantageError(message, 404);
   }
 
   const symbol = quote["01. symbol"];
