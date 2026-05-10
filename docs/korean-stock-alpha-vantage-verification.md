@@ -31,3 +31,28 @@ Recommended next direction:
 2. Add a separate provider path for Korean stocks.
 3. Evaluate a free Korean-stock source such as a Yahoo Finance-compatible endpoint or another source suitable for study use.
 
+## Follow-up
+
+The app now uses a separate Korean-stock provider based on Naver Finance's realtime polling endpoint for `market=KR`.
+
+Example:
+
+```text
+GET /api/quote?symbol=005930.KS&market=KR
+```
+
+Verified response shape:
+
+```json
+{
+  "quote": {
+    "symbol": "005930.KS",
+    "price": "268500",
+    "high": "270000",
+    "low": "260000",
+    "change": "3000",
+    "changePercent": "1.10%",
+    "latestTradingDay": "2026-05-08"
+  }
+}
+```

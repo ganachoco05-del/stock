@@ -19,6 +19,7 @@ import {
 import { defaultFavoriteStocks, stockList } from "@/lib/stocks";
 import type {
   FavoriteStock,
+  StockCurrency,
   StockMarket,
   StockQuote,
   StockSummary,
@@ -47,7 +48,7 @@ const getClientHydrationState = () => true;
 
 const getServerHydrationState = () => false;
 
-const formatCurrency = (value?: string) => {
+const formatCurrency = (value: string | undefined, currency: StockCurrency) => {
   if (!value) {
     return "-";
   }
@@ -58,13 +59,19 @@ const formatCurrency = (value?: string) => {
     return value;
   }
 
+  if (currency === "KRW") {
+    return `${numberValue.toLocaleString("ko-KR", {
+      maximumFractionDigits: 0,
+    })}원`;
+  }
+
   return `$${numberValue.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 };
 
-const formatChange = (quote: StockQuote | null) => {
+const formatChange = (quote: StockQuote | null, currency: StockCurrency) => {
   if (!quote) {
     return "-";
   }
@@ -72,7 +79,7 @@ const formatChange = (quote: StockQuote | null) => {
   const changeValue = Number(quote.change);
   const formattedChange = Number.isNaN(changeValue)
     ? quote.change
-    : `$${changeValue.toFixed(2)}`;
+    : formatCurrency(quote.change, currency);
 
   return `${formattedChange} (${quote.changePercent})`;
 };
@@ -561,24 +568,24 @@ export default function Home() {
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <QuoteMetric
               label="현재가"
-              value={formatCurrency(quote?.price)}
+              value={formatCurrency(quote?.price, selectedStock.currency)}
               loading={quoteLoading}
             />
             <QuoteMetric
               label="오늘 최고가"
-              value={formatCurrency(quote?.high)}
+              value={formatCurrency(quote?.high, selectedStock.currency)}
               tone="up"
               loading={quoteLoading}
             />
             <QuoteMetric
               label="오늘 최저가"
-              value={formatCurrency(quote?.low)}
+              value={formatCurrency(quote?.low, selectedStock.currency)}
               tone="down"
               loading={quoteLoading}
             />
             <QuoteMetric
               label="전일 대비"
-              value={formatChange(quote)}
+              value={formatChange(quote, selectedStock.currency)}
               tone={changeTone}
               loading={quoteLoading}
             />

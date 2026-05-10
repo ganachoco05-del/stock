@@ -3,6 +3,10 @@ import {
   AlphaVantageError,
   parseAlphaVantageQuote,
 } from "@/lib/alphaVantage";
+import {
+  fetchNaverFinanceQuote,
+  NaverFinanceError,
+} from "@/lib/naverFinance";
 import type { StockMarket } from "@/types/stock";
 
 const ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query";
@@ -29,22 +33,28 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          "ALPHA_VANTAGE_API_KEY 환경변수가 없습니다. .env.local 파일에 API 키를 설정해주세요.",
-      },
-      { status: 500 },
-    );
-  }
-
-  const url = new URL(ALPHA_VANTAGE_URL);
-  url.searchParams.set("function", "GLOBAL_QUOTE");
-  url.searchParams.set("symbol", symbol);
-  url.searchParams.set("apikey", apiKey);
-
   try {
+    if (market === "KR") {
+      const quote = await fetchNaverFinanceQuote(symbol);
+
+      return NextResponse.json({ quote });
+    }
+
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error:
+            "ALPHA_VANTAGE_API_KEY 환경변수가 없습니다. .env.local 파일에 API 키를 설정해주세요.",
+        },
+        { status: 500 },
+      );
+    }
+
+    const url = new URL(ALPHA_VANTAGE_URL);
+    url.searchParams.set("function", "GLOBAL_QUOTE");
+    url.searchParams.set("symbol", symbol);
+    url.searchParams.set("apikey", apiKey);
+
     const response = await fetch(url, {
       next: { revalidate: 60 },
     });
@@ -61,7 +71,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ quote });
   } catch (error) {
-    if (error instanceof AlphaVantageError) {
+    if (
+      error instanceof AlphaVantageError ||
+      error instanceof NaverFinanceError
+    ) {
       return NextResponse.json(
         { error: error.message },
         { status: error.status },
